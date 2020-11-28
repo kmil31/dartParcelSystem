@@ -109,7 +109,6 @@ __  ___  ___   _   _   ___  _____  ________  ___ _____ _   _ _____
       }
     } catch (e) {
       print("Your input was wrong!");
-    
     }
   } while (choice != 4); // end of do while loop
   new File(filename).writeAsString(jsonEncode(
@@ -130,11 +129,11 @@ void insertParcel() {
         houseNum--;
         for (int i = 0; i < 5; i++) {
           if (pList[houseNum][i] == null) {
-            pList[houseNum][i] = new Parcel(pName);
+            pList[houseNum][i] = new Parcel(pName,now);
             print("parcel inserted into slot ${i + 1}");
             break;
           } else {
-            print("Slot ${i+1} is occupied");
+            print("Slot ${i + 1} is occupied");
           }
         }
         break;
