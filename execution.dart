@@ -10,11 +10,35 @@ int row = 30;
 int col = 5;
 dynamic pList = List.generate(row, (i) => List(col), growable: false);
 //LIST STUFF
+var filename = 'data.json';
+
+void init() async {
+  var contents = await File(filename).readAsString(); // reads from file
+
+  Iterable decoded =
+      json.decode(contents); // gets an iterable from a decoded json string
+  List<dynamic> templist; // turns it into a lsit
+
+  for (int i = 0; i < 30; i++) {
+    try {
+      templist = decoded
+          .elementAt(i)
+          .toList(); // Iterable Element > tempList Element > Actual List element
+      for (int j = 0; j < templist.length; j++) {
+        pList[i][j] =
+            Parcel.fromJson(templist[j]); // finally assigns it to the 2D list.
+      }
+    } catch (e) {
+      continue;
+    }
+  }
+}
 
 main() async {
   int choice; // loop flag
 
-  // initialising end
+  await init(); //blocks the execution of program until init is finished
+
   print(r"""\
 
 ______  ___  ______  _____  _____ _                                  
@@ -40,6 +64,7 @@ __  ___  ___   _   _   ___  _____  ________  ___ _____ _   _ _____
 """);
 
   do {
+    //start of do while loop
     print("Today's Date:  $now");
     try {
       print(r"""\
@@ -60,7 +85,7 @@ __  ___  ___   _   _   ___  _____  ________  ___ _____ _   _ _____
         case 1:
           {
             insertParcel();
-            print("\n\n\n\n\n\n");
+            print("\n\n");
             continue;
           }
         case 2:
@@ -73,18 +98,22 @@ __  ___  ___   _   _   ___  _____  ________  ___ _____ _   _ _____
         case 3:
           {
             print("\n\n\n");
+            print("One day has passed!");
             now = now.add(new Duration(days: 1));
             parcelDeletion();
-            print("One day has passed!");
+
             print("\n\n\n");
 
             continue;
           }
       }
     } catch (e) {
-      print(e);
+      print("Your input was wrong!");
+    
     }
-  } while (choice != 4);
+  } while (choice != 4); // end of do while loop
+  new File(filename).writeAsString(jsonEncode(
+      pList)); // at program end, write the contents of pList to data.json
 } //end of main
 
 void insertParcel() {
@@ -102,11 +131,10 @@ void insertParcel() {
         for (int i = 0; i < 5; i++) {
           if (pList[houseNum][i] == null) {
             pList[houseNum][i] = new Parcel(pName);
+            print("parcel inserted into slot ${i + 1}");
             break;
           } else {
-            print(
-                "It seems like this house is full of parcels! Let's start over");
-            break;
+            print("Slot $i is occupied");
           }
         }
         break;
@@ -129,7 +157,7 @@ void viewParcel() {
         for (int i = 0; i < 5; i++) {
           if (pList[houseNum][i] != null) {
             print(
-                "Parcel ${i + 1} : ${pList[houseNum][i].ParcelName} \t Parcel Date: ${pList[houseNum][i].date} ");
+                "Parcel ${i + 1} Name : ${pList[houseNum][i].getParcelName} \t\t Parcel Date: ${pList[houseNum][i].date} ");
           } else
             print("Parcel Slot ${i + 1} is empty!");
           continue;
@@ -143,13 +171,16 @@ void viewParcel() {
 }
 
 void parcelDeletion() {
+  // iterates through the pList and calcs difference in days between the parcelDate
+  // and todays date
   var difference;
   for (int i = 0; i < 30; i++) {
     for (int j = 0; j < 5; j++) {
       if (pList[i][j] != null) {
         difference = now.difference(pList[i][j].date);
         if (difference.inDays >= 2) {
-          print("ITS DIFFERENT");
+          print(
+              "The parcel at house ${i + 1} and slot ${j + 1} has been removed!");
           pList[i][j] = null;
         }
       }
