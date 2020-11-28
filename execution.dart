@@ -134,7 +134,7 @@ void insertParcel() {
             print("parcel inserted into slot ${i + 1}");
             break;
           } else {
-            print("Slot $i is occupied");
+            print("Slot ${i+1} is occupied");
           }
         }
         break;
